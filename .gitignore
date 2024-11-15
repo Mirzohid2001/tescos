@@ -1,0 +1,85 @@
+# Python bytecode
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+local_settings.py
+
+# PostgreSQL
+*.pgdata
+*.pgsql
+*.pg_dump
+
+# Ignore environment and secrets
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+*.env
+.env
+.env.*
+
+# Ignore migrations
+**/migrations/*
+
+# Ignore coverage and testing results
+.coverage
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# PyCharm project files
+.idea/
+
+# VS Code project files
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore temporary files created by text editors
+*.swp
+*~
+*.bak
+*.tmp
+*.old
+*.orig
+
+# Logs and debug files
+*.log
+*.out
+
+# Node modules
+node_modules/
+
+# Ignore specific tools (optional)
+__pycache__/
