@@ -2,16 +2,16 @@ from django.shortcuts import render
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from .models import News, Category, Product, \
     ContactInquiry, Promotion, Project
 from .serializers import NewsSerializers, ProductSerializer, ProductDetailSerializer, \
-    OrderProductSerializer, ContactInquirySerializer, PromotionSerializer, ProjectSerializer, ProductSummarySerializer, \
+    OrderProductSerializer, ContactInquirySerializer, PromotionSerializer, ProjectSerializer, \
     CategoryProductSerializer
 from django.conf import settings
 import requests
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter
+import requests
 from django.db.models import Q
 
 
@@ -34,12 +34,13 @@ class PromotionDetailView(generics.RetrieveAPIView):
     serializer_class = PromotionSerializer
     lookup_field = 'id'
 
-
 class CategoryProductAPIView(APIView):
     def get(self, request):
-        categories = Category.objects.filter(parent__isnull=True)  # Fetch only top-level categories
+        categories = Category.objects.all()
+        if not categories:
+            return Response({"detail": "No categories found."}, status=404)
         serializer = CategoryProductSerializer(categories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=200)
 
 
 class ProductAPIView(APIView):
@@ -107,7 +108,6 @@ class ContactInquiryCreateView(generics.CreateAPIView):
             {"message": "Thank you for your inquiry.", "data": serializer.data},
             status=status.HTTP_201_CREATED
         )
-
 
 class ProjectListView(generics.ListAPIView):
     queryset = Project.objects.all()

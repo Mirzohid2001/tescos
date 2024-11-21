@@ -33,12 +33,11 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.parent.name} -> {self.name}" if self.parent else self.name
+        return self.name
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ['name']
 
 
 class Product(models.Model):
@@ -47,7 +46,7 @@ class Product(models.Model):
     short_description = models.TextField()
     full_description = RichTextField()
     image = models.ImageField(upload_to='products/')
-    contact = models.CharField(max_length=100, verbose_name="Контакты")
+    contact = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

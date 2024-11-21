@@ -15,5 +15,4 @@ urlpatterns = [
     path('projects/<int:id>/', ProjectDetailView.as_view(), name='project-detail'),
     path('search/products/', ProductSearchView.as_view(), name='product-search'),
     path('search/categories/', CategorySearchView.as_view(), name='category-search'),
-
 ]

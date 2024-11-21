@@ -38,7 +38,12 @@ ENV/
 .env
 .env.*
 
+<<<<<<< HEAD
 
+=======
+# Ignore migrations
+**/migrations/*
+>>>>>>> 4eccb279b716531d55039dbb9e3f86b3864dd97b
 
 # Ignore coverage and testing results
 .coverage
@@ -82,5 +87,8 @@ node_modules/
 
 # Ignore specific tools (optional)
 __pycache__/
+<<<<<<< HEAD
 
 settings_dev.py
+=======
+>>>>>>> 4eccb279b716531d55039dbb9e3f86b3864dd97b

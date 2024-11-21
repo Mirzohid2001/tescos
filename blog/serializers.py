@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import News, Category, Product, \
+from .models import News, Category, Product
+from .models import News, Gallery, Product, \
     OrderProduct, ContactInquiry, Promotion, Project
 
 
@@ -7,60 +8,6 @@ class NewsSerializers(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ('id', 'title', 'content', 'image', 'created_at', 'updated_at')
-
-
-# class ShelvingCategorySerializers(serializers.ModelSerializer):
-#     class Meta:
-#         model = ShelvingCategory
-#         fields = ('id', 'name', 'created_at', 'updated_at')
-#
-#
-# class ShelvingGallerySerializer(serializers.ModelSerializer):
-#     img = serializers.ImageField(use_url=True)
-#
-#     class Meta:
-#         model = ShelvingGallery
-#         fields = ['img']
-
-
-# class ShelvingSerializer(serializers.ModelSerializer):
-#     img = serializers.ImageField(use_url=True)
-#     gallery = ShelvingGallerySerializer(many=True, read_only=True)
-#
-#     class Meta:
-#         model = Shelving
-#         fields = [
-#             'id',
-#             'title',
-#             'about',
-#             'Shelvesdepth',
-#             'Dimensions',
-#             'Loadcapacityofeachshelf',
-#             'bracket',
-#             'color',
-#             'img',
-#             'category',
-#             'order',
-#             'created_at',
-#             'updated_at',
-#             'gallery',
-#         ]
-
-
-class ProductSummarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'short_description', 'image', 'created_at']
-#
-# class ShelvingSummarySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Shelving
-#         fields = ['id', 'title', 'about', 'img', 'created_at']
-#
-# class ShelvingOrderSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ShelvingOrder
-#         fields = ['name', 'phone', 'address', 'shelving', 'count', 'created_at']
 
 
 class CategoryProductSerializer(serializers.ModelSerializer):
@@ -101,7 +48,14 @@ class ProductSerializer(serializers.ModelSerializer):
         return None
 
 
+class GallerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallery
+        fields = ['id', 'image', 'created_at', 'updated_at']
+
+
 class ProductDetailSerializer(serializers.ModelSerializer):
+    gallery = GallerySerializer(many=True, read_only=True)
     category = serializers.SerializerMethodField()
 
     class Meta:
@@ -114,6 +68,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'full_description',
             'image',
             'contact',
+            'gallery',
             'created_at',
             'updated_at'
         ]
@@ -139,13 +94,12 @@ class OrderProductSerializer(serializers.ModelSerializer):
 
 class PromotionSerializer(serializers.ModelSerializer):
     products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    shelvings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Promotion
         fields = [
             'id', 'title', 'description', 'start_date', 'end_date',
-            'discount_percentage', 'products', 'shelvings'
+            'discount_percentage', 'products'
         ]
 
 
@@ -166,8 +120,7 @@ class ContactInquirySerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    shelvings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'description', 'image', 'products', 'shelvings', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'image', 'products', 'created_at', 'updated_at']

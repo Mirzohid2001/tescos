@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry
+from .models import (
+    News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry
+)
 
 
-# News Admin
+# Admin configuration for News
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at', 'updated_at')
@@ -11,49 +13,49 @@ class NewsAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 
-# Category Admin
+# Admin configuration for Category
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent', 'created_at', 'updated_at')
+    list_display = ('name', 'parent')
     search_fields = ('name',)
-    list_filter = ('created_at',)
+    list_filter = ('parent',)
     ordering = ('name',)
-    prepopulated_fields = {"name": ("parent",)}  # Optional for better handling of names
 
 
-# Product Admin
+# Inline configuration for Gallery
 class GalleryInline(admin.TabularInline):
     model = Gallery
     extra = 1
 
 
+# Admin configuration for Product
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'contact', 'created_at', 'updated_at')
+    list_display = ('name', 'category', 'short_description')
     search_fields = ('name', 'short_description', 'category__name')
-    list_filter = ('category', 'created_at')
-    ordering = ('-created_at',)
+    list_filter = ('category',)
+    ordering = ('name',)
     inlines = [GalleryInline]
 
 
-# Gallery Admin
+# Admin configuration for Gallery
 @admin.register(Gallery)
 class GalleryAdmin(admin.ModelAdmin):
-    list_display = ('product', 'image', 'created_at')
+    list_display = ('product', 'image', 'created_at', 'updated_at')
     search_fields = ('product__name',)
     list_filter = ('created_at',)
 
 
-# OrderProduct Admin
+# Admin configuration for OrderProduct
 @admin.register(OrderProduct)
 class OrderProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'product', 'phone', 'address', 'count', 'created_at')
-    search_fields = ('name', 'product__name', 'phone', 'address')
-    list_filter = ('created_at', 'product__category')
+    search_fields = ('name', 'phone', 'address', 'product__name')
+    list_filter = ('created_at',)
     ordering = ('-created_at',)
 
 
-# Promotion Admin
+# Admin configuration for Promotion
 @admin.register(Promotion)
 class PromotionAdmin(admin.ModelAdmin):
     list_display = ('title', 'discount_percentage', 'start_date', 'end_date')
@@ -63,7 +65,7 @@ class PromotionAdmin(admin.ModelAdmin):
     filter_horizontal = ('products',)
 
 
-# Project Admin
+# Admin configuration for Project
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at', 'updated_at')
@@ -73,7 +75,7 @@ class ProjectAdmin(admin.ModelAdmin):
     filter_horizontal = ('products',)
 
 
-# ContactInquiry Admin
+# Admin configuration for ContactInquiry
 @admin.register(ContactInquiry)
 class ContactInquiryAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone', 'email', 'interested_product', 'submitted_at')
