@@ -31,7 +31,7 @@ class GalleryInline(admin.TabularInline):
 # Admin configuration for Product
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'short_description')
+    list_display = ('name', 'category', 'short_description', 'price')
     search_fields = ('name', 'short_description', 'category__name')
     list_filter = ('category',)
     ordering = ('name',)

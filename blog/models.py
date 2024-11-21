@@ -47,6 +47,7 @@ class Product(models.Model):
     full_description = RichTextField()
     image = models.ImageField(upload_to='products/')
     contact = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -81,8 +82,8 @@ class OrderProduct(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'ЗаказПродукта'
-        verbose_name_plural = 'ЗаказыПродуктов'
+        verbose_name = 'Заказ Продукта'
+        verbose_name_plural = 'Заказы Продуктов'
 
 
 class Promotion(models.Model):
@@ -91,7 +92,7 @@ class Promotion(models.Model):
     start_date = models.DateTimeField(verbose_name="Дата начала")
     end_date = models.DateTimeField(verbose_name="Дата окончания")
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2,
-                                              verbose_name="Скидка (%)")
+                                              verbose_name="Скидка (%)", null=True, blank=True)
     products = models.ManyToManyField('Product', related_name='promotions', blank=True, verbose_name="Продукты")
 
     def __str__(self):

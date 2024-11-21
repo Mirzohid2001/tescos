@@ -34,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'image',
             'contact',
             'category',
+            'price',
             'created_at',
             'updated_at'
         ]
@@ -69,6 +70,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'image',
             'contact',
             'gallery',
+            'price',
             'created_at',
             'updated_at'
         ]
