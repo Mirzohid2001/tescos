@@ -34,20 +34,43 @@ class PromotionDetailView(generics.RetrieveAPIView):
     serializer_class = PromotionSerializer
     lookup_field = 'id'
 
-class CategoryProductAPIView(APIView):
+
+class CategoryWithProductsAPIView(APIView):
     def get(self, request):
         categories = Category.objects.all()
-        if not categories:
-            return Response({"detail": "No categories found."}, status=404)
-        serializer = CategoryProductSerializer(categories, many=True)
-        return Response(serializer.data, status=200)
+        if not categories.exists():
+            return Response({"detail": "No categories found."}, status=status.HTTP_404_NOT_FOUND)
+
+        data = []
+        for category in categories:
+            products = Product.objects.filter(category=category).order_by('-created_at')[:4]
+            serialized_category = {
+                "category": CategoryProductSerializer(category).data,
+                "products": ProductSerializer(products, many=True).data
+            }
+            data.append(serialized_category)
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
-class ProductAPIView(APIView):
+class ProductsByCategoryAPIView(APIView):
     def get(self, request):
-        products = Product.objects.all().order_by('-created_at')[:4]
+        category_id = request.query_params.get('category_id')
+        if not category_id:
+            return Response({"detail": "Category ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        products = Product.objects.filter(category=category).order_by('-created_at')
         serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({
+            "category": CategoryProductSerializer(category).data,
+            "products": serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 class ProductDetailView(APIView):
@@ -108,6 +131,7 @@ class ContactInquiryCreateView(generics.CreateAPIView):
             {"message": "Thank you for your inquiry.", "data": serializer.data},
             status=status.HTTP_201_CREATED
         )
+
 
 class ProjectListView(generics.ListAPIView):
     queryset = Project.objects.all()

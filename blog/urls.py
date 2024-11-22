@@ -1,12 +1,13 @@
 from django.urls import path
-from .views import NewsAPIView, ProductAPIView, \
-    ProductDetailView, CategoryProductAPIView, ContactInquiryCreateView, PromotionListView, PromotionDetailView, \
-    ProjectListView, ProjectDetailView, ProductSearchView, CategorySearchView
+from .views import NewsAPIView, \
+    ProductDetailView, ContactInquiryCreateView, PromotionListView, PromotionDetailView, \
+    ProjectListView, ProjectDetailView, ProductSearchView, CategorySearchView, CategoryWithProductsAPIView, \
+    ProductsByCategoryAPIView
 
 urlpatterns = [
     path('news/', NewsAPIView.as_view(), name='news'),
-    path('product/', ProductAPIView.as_view(), name='product'),
-    path('category/', CategoryProductAPIView.as_view(), name='categoryproduct'),
+    path('products-by-category/', ProductsByCategoryAPIView.as_view(), name='products_by_category'),
+    path('categories-with-products/', CategoryWithProductsAPIView.as_view(), name='categories_with_products'),
     path('productdetail/<int:id>/', ProductDetailView.as_view(), name='productdetail'),
     path('contactinquiry/', ContactInquiryCreateView.as_view(), name='contactinquiry'),
     path('promotions/', PromotionListView.as_view(), name='promotion-list'),

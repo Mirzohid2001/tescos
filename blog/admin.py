@@ -1,7 +1,10 @@
 from django.contrib import admin
 from .models import (
-    News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry
+    News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry, About , ProductImage
 )
+
+from django.db import models
+from ckeditor.widgets import CKEditorWidget
 
 
 # Admin configuration for News
@@ -29,13 +32,17 @@ class GalleryInline(admin.TabularInline):
 
 
 # Admin configuration for Product
-@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'short_description', 'price')
-    search_fields = ('name', 'short_description', 'category__name')
-    list_filter = ('category',)
-    ordering = ('name',)
-    inlines = [GalleryInline]
+    formfield_overrides = {
+        models.TextField: {'widget': CKEditorWidget(config_name='default')},
+    }
+    list_display = ('name', 'category', 'price', 'created_at', 'updated_at')
+    search_fields = ('name', 'category__name', 'short_description', 'full_description')
+    list_filter = ('category', 'created_at', 'updated_at')
+    ordering = ('-created_at',)
+
+
+admin.site.register(Product, ProductAdmin)
 
 
 # Admin configuration for Gallery
@@ -82,3 +89,14 @@ class ContactInquiryAdmin(admin.ModelAdmin):
     search_fields = ('name', 'phone', 'email', 'interested_product', 'message')
     list_filter = ('submitted_at', 'consent')
     ordering = ('-submitted_at',)
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    list_display = ('product', 'image', 'created_at', 'updated_at')
+    search_fields = ('product__name',)
+    list_filter = ('created_at',)
+    ordering = ('-created_at',)
+
+
+# Admin configuration for About
+admin.site.register(About)
