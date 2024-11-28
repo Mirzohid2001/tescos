@@ -3,10 +3,10 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import News, Category, Product, \
-    ContactInquiry, Promotion, Project
+    ContactInquiry, Promotion, Project, About
 from .serializers import NewsSerializers, ProductSerializer, ProductDetailSerializer, \
     OrderProductSerializer, ContactInquirySerializer, PromotionSerializer, ProjectSerializer, \
-    CategoryProductSerializer
+    CategoryProductSerializer, AboutSerializer
 from django.conf import settings
 import requests
 from rest_framework.generics import ListAPIView
@@ -157,3 +157,10 @@ class CategorySearchView(ListAPIView):
     serializer_class = CategoryProductSerializer
     filter_backends = [SearchFilter]
     search_fields = ['name', 'parent__name']
+
+
+class AboutAPIVIew(APIView):
+    def get(self, request):
+        about = About.objects.first()
+        serializer = AboutSerializer(about)
+        return Response(serializer.data)
