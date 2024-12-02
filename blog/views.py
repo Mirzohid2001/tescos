@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import status, generics
+from rest_framework import status, generics, serializers
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import News, Category, Product, \
@@ -13,6 +14,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter
 import requests
 from django.db.models import Q
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.
@@ -35,11 +38,21 @@ class PromotionDetailView(generics.RetrieveAPIView):
     lookup_field = 'id'
 
 
-class CategoryWithProductsAPIView(APIView):
-    def get(self, request):
-        categories = Category.objects.all()
-        if not categories.exists():
-            return Response({"detail": "No categories found."}, status=status.HTTP_404_NOT_FOUND)
+class CategoryWithProductsPagination(PageNumberPagination):
+    page_size = 4
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
+class CategoryWithProductsAPIView(ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategoryProductSerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    search_fields = ['name', 'parent__name']
+    filterset_fields = ['parent']
+    pagination_class = CategoryWithProductsPagination
+
+    def list(self, request, *args, **kwargs):
+        categories = self.filter_queryset(self.get_queryset())
 
         data = []
         for category in categories:
@@ -53,24 +66,46 @@ class CategoryWithProductsAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class ProductsByCategoryAPIView(APIView):
-    def get(self, request):
-        category_id = request.query_params.get('category_id')
+
+class ProductsByCategoryPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+
+class ProductsByCategoryAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
+    search_fields = ['name', 'short_description', 'full_description']
+    filterset_fields = ['price', 'is_available']
+    ordering_fields = ['price', 'created_at']
+    pagination_class = ProductsByCategoryPagination
+
+    def get_queryset(self):
+        category_id = self.request.query_params.get('category_id')
         if not category_id:
-            return Response({"detail": "Category ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError({"detail": "Category ID is required."})
 
         try:
             category = Category.objects.get(id=category_id)
         except Category.DoesNotExist:
+            raise serializers.ValidationError({"detail": "Category not found."})
+
+        return Product.objects.filter(category=category).order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        category_id = self.request.query_params.get('category_id')
+        category = Category.objects.filter(id=category_id).first()
+        if not category:
             return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        products = Product.objects.filter(category=category).order_by('-created_at')
-        serializer = ProductSerializer(products, many=True)
-
-        return Response({
-            "category": CategoryProductSerializer(category).data,
-            "products": serializer.data
-        }, status=status.HTTP_200_OK)
+        category_data = CategoryProductSerializer(category).data
+        response = super().get(request, *args, **kwargs)
+        response.data = {
+            "category": category_data,
+            "products": response.data
+        }
+        return response
 
 
 class ProductDetailView(APIView):
@@ -144,19 +179,19 @@ class ProjectDetailView(generics.RetrieveAPIView):
     lookup_field = 'id'
 
 
-class ProductSearchView(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ['name', 'short_description', 'full_description', 'category__name']
-
-
-# Search for Categories
-class CategorySearchView(ListAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategoryProductSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ['name', 'parent__name']
+# class ProductSearchView(ListAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     filter_backends = [SearchFilter]
+#     search_fields = ['name', 'short_description', 'full_description', 'category__name']
+#
+#
+# # Search for Categories
+# class CategorySearchView(ListAPIView):
+#     queryset = Category.objects.all()
+#     serializer_class = CategoryProductSerializer
+#     filter_backends = [SearchFilter]
+#     search_fields = ['name', 'parent__name']
 
 
 class AboutAPIVIew(APIView):

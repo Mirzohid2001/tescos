@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import NewsAPIView, \
     ProductDetailView, ContactInquiryCreateView, PromotionListView, PromotionDetailView, \
-    ProjectListView, ProjectDetailView, ProductSearchView, CategorySearchView, CategoryWithProductsAPIView, \
+    ProjectListView, ProjectDetailView, CategoryWithProductsAPIView, \
     ProductsByCategoryAPIView,AboutAPIVIew
 
 urlpatterns = [
@@ -15,6 +15,4 @@ urlpatterns = [
     path('promotions/<int:id>/', PromotionDetailView.as_view(), name='promotion-detail'),
     path('projects/', ProjectListView.as_view(), name='project-list'),
     path('projects/<int:id>/', ProjectDetailView.as_view(), name='project-detail'),
-    path('search/products/', ProductSearchView.as_view(), name='product-search'),
-    path('search/categories/', CategorySearchView.as_view(), name='category-search'),
 ]

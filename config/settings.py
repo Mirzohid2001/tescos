@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'blog',
     'corsheaders',
     'ckeditor',
+    'django_filters',
 ]
 
 CKEDITOR_CONFIGS = {
@@ -96,6 +97,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_FILTER_BACKENDS': [
+#         'django_filters.rest_framework.DjangoFilterBackend',
+#         'rest_framework.filters.SearchFilter',
+#     ],
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
