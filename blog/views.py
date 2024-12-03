@@ -38,21 +38,11 @@ class PromotionDetailView(generics.RetrieveAPIView):
     lookup_field = 'id'
 
 
-class CategoryWithProductsPagination(PageNumberPagination):
-    page_size = 4
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-
-class CategoryWithProductsAPIView(ListAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategoryProductSerializer
-    filter_backends = [SearchFilter, DjangoFilterBackend]
-    search_fields = ['name', 'parent__name']
-    filterset_fields = ['parent']
-    pagination_class = CategoryWithProductsPagination
-
-    def list(self, request, *args, **kwargs):
-        categories = self.filter_queryset(self.get_queryset())
+class CategoryWithProductsAPIView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        if not categories.exists():
+            return Response({"detail": "No categories found."}, status=status.HTTP_404_NOT_FOUND)
 
         data = []
         for category in categories:
@@ -66,46 +56,45 @@ class CategoryWithProductsAPIView(ListAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
-class ProductsByCategoryPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 50
-
-
-class ProductsByCategoryAPIView(ListAPIView):
-    serializer_class = ProductSerializer
-    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
-    search_fields = ['name', 'short_description', 'full_description']
-    filterset_fields = ['price', 'is_available']
-    ordering_fields = ['price', 'created_at']
-    pagination_class = ProductsByCategoryPagination
-
-    def get_queryset(self):
-        category_id = self.request.query_params.get('category_id')
+class ProductsByCategoryAPIView(APIView):
+    def get(self, request):
+        category_id = request.query_params.get('category_id')
         if not category_id:
-            raise serializers.ValidationError({"detail": "Category ID is required."})
+            return Response({"detail": "Category ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             category = Category.objects.get(id=category_id)
         except Category.DoesNotExist:
-            raise serializers.ValidationError({"detail": "Category not found."})
-
-        return Product.objects.filter(category=category).order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        category_id = self.request.query_params.get('category_id')
-        category = Category.objects.filter(id=category_id).first()
-        if not category:
             return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        category_data = CategoryProductSerializer(category).data
-        response = super().get(request, *args, **kwargs)
-        response.data = {
-            "category": category_data,
-            "products": response.data
-        }
-        return response
+        products = Product.objects.filter(category=category).order_by('-created_at')
+        serializer = ProductSerializer(products, many=True)
+
+        return Response({
+            "category": CategoryProductSerializer(category).data,
+            "products": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class AllProductsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': self.page.paginator.count,
+            'results': data
+        })
+
+
+class AllProductsAPIView(ListAPIView):
+    queryset = Product.objects.all().order_by('-created_at')
+    serializer_class = ProductSerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    search_fields = ['name', 'short_description', 'full_description']
+    filterset_fields = ['category']
+    pagination_class = AllProductsPagination
 
 
 class ProductDetailView(APIView):
