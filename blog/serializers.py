@@ -23,9 +23,14 @@ class CategoryProductSerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'created_at', 'updated_at']
+
+    def get_image(self, obj):
+        return obj.image.url if obj.image else None
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -35,7 +40,7 @@ class GallerySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)  # Correct related name
+    images = ProductImageSerializer(many=True, read_only=True)
     category = serializers.SerializerMethodField()
 
     class Meta:
@@ -63,6 +68,9 @@ class ProductSerializer(serializers.ModelSerializer):
                 } if obj.category.parent else None
             }
         return None
+
+    def get_images(self, obj):
+        return [image for image in obj.images]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
