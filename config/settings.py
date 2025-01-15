@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-y!u^o(q=7*$uw73h#0%f6#3lpr+0q%nny^w*)-)=_zcsygmxq&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://tescos-q8he-rcj5ae2vb-shakhbozvs-projects.vercel.app/',
+                 'tescosmetall.uz',
+                 'localhost:3000',]
 
 # Application definition
 
@@ -76,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 
 ROOT_URLCONF = 'config.urls'
 
