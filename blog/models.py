@@ -2,6 +2,7 @@ from django.db import models
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
+
 # Create your models here.
 
 class News(models.Model):
@@ -45,7 +46,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     short_description = models.TextField()
     full_description = RichTextUploadingField()
-    contact = models.CharField(max_length=255,null=True,blank=True)
+    contact = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -147,7 +148,6 @@ class ContactInquiry(models.Model):
     name = models.CharField(max_length=100, verbose_name="Ваше имя")
     phone = models.CharField(max_length=20, verbose_name="Телефон")
     email = models.EmailField(blank=True, null=True, verbose_name="E-mail")
-    interested_product = models.CharField(max_length=255, verbose_name="Интересующая продукция")
     message = models.TextField(verbose_name="Сообщение")
     attached_file = models.FileField(upload_to='inquiries/', blank=True, null=True, verbose_name="Прикрепить файл")
     consent = models.BooleanField(default=False, verbose_name="Согласен на обработку персональных данных")

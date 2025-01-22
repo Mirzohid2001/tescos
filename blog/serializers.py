@@ -134,7 +134,7 @@ class ContactInquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactInquiry
         fields = [
-            'name', 'phone', 'email', 'interested_product',
+            'name', 'phone', 'email',
             'message', 'attached_file', 'consent', 'submitted_at'
         ]
         read_only_fields = ('submitted_at',)

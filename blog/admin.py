@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import (
-    News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry, About , ProductImage
-)
 
+from .forms import ProductAdminForm
+from .models import (
+    News, Category, Product, Gallery, OrderProduct, Promotion, Project, ContactInquiry, About, ProductImage
+)
 from django.db import models
 from ckeditor.widgets import CKEditorWidget
 
@@ -26,23 +27,27 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 # Inline configuration for Gallery
-class GalleryInline(admin.TabularInline):
-    model = Gallery
-    extra = 1
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 3
 
 
 # Admin configuration for Product
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': CKEditorWidget(config_name='default')},
     }
+
+    inlines = [ProductImageInline]
+
     list_display = ('name', 'category', 'price', 'created_at', 'updated_at')
     search_fields = ('name', 'category__name', 'short_description', 'full_description')
     list_filter = ('category', 'created_at', 'updated_at')
     ordering = ('-created_at',)
 
 
-admin.site.register(Product, ProductAdmin)
+# admin.site.register(Product, ProductAdmin)
 
 
 # Admin configuration for Gallery
@@ -53,7 +58,6 @@ class GalleryAdmin(admin.ModelAdmin):
     list_filter = ('created_at',)
 
 
-# Admin configuration for OrderProduct
 @admin.register(OrderProduct)
 class OrderProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'product', 'phone', 'address', 'count', 'created_at')
@@ -85,10 +89,11 @@ class ProjectAdmin(admin.ModelAdmin):
 # Admin configuration for ContactInquiry
 @admin.register(ContactInquiry)
 class ContactInquiryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'email', 'interested_product', 'submitted_at')
-    search_fields = ('name', 'phone', 'email', 'interested_product', 'message')
+    list_display = ('name', 'phone', 'email', 'submitted_at')
+    search_fields = ('name', 'phone', 'email', 'message')
     list_filter = ('submitted_at', 'consent')
     ordering = ('-submitted_at',)
+
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
